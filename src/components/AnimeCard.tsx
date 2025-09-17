@@ -20,8 +20,8 @@ export default function AnimeCard({ anime }: Props) {
   };
 
   return (
-    <Link href={`/anime/${anime._id}`} className="group block overflow-hidden rounded-lg">
-      <div className="relative h-[320px] w-[225px] bg-gray-800">
+    <Link href={`/anime/${anime._id}`} className="group block overflow-hidden h-[370px] w-[225px] rounded-lg">
+      <div className="relative h-[320px] w-[225px] bg-gray-800 overflow-hidden">
         {/* Lakukan pengecekan di sini */}
         {isValidUrl(anime.posterImage) ? (
           // JIKA URL VALID: Tampilkan gambar

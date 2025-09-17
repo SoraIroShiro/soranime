@@ -1,4 +1,5 @@
 import AnimeCard from '@/components/AnimeCard';
+import Navbar from '@/components/Navbar';
 
 // Definisikan tipe data untuk objek anime dari API
 interface Anime {
@@ -32,6 +33,7 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-gray-900 p-4 sm:p-6 lg:p-8">
+      <Navbar/>
       <div className="container mx-auto">
         <h1 className="mb-8 text-2xl font-bold text-white sm:text-3xl">
           Anime Terbaru
