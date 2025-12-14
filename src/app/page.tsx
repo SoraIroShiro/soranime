@@ -6,25 +6,31 @@ interface Anime {
   _id: string;
   title: string;
   posterImage: string;
+  synopsis?: string;
+  genres?: string[];
+  rating?: number;
+  status?: string;
 }
 
-// Fungsi untuk mengambil data anime
+// Fungsi untuk mengambil SEMUA data anime (bukan satu anime)
 async function getAnimes(): Promise<Anime[]> {
   try {
-    const res = await fetch('http://localhost:5000/api/animes', {
-      // cache: 'no-store' akan membuat data selalu baru setiap kali halaman dikunjungi
-      // 'force-cache' (default) akan membuat data di-cache selamanya
-      cache: 'no-store', 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/animes`, { 
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      }
     });
-
-    if (!res.ok) {
-      throw new Error('Gagal mengambil data dari API');
-    }
     
+    if (!res.ok) {
+      console.error('Fetch error:', res.status, res.statusText);
+      return [];
+    }
     return res.json();
   } catch (error) {
-    console.error(error);
-    return []; // Kembalikan array kosong jika terjadi error
+    console.error('Fetch failed:', error);
+    return [];
   }
 }
 
@@ -48,7 +54,6 @@ export default async function HomePage() {
         ) : (
           <p className="text-center text-gray-400">Gagal memuat anime atau tidak ada data.</p>
         )}
-
       </div>
     </main>
   );

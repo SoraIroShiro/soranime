@@ -22,7 +22,9 @@ interface AnimeDetails {
 // Fungsi untuk mengambil data detail dari API
 async function getAnimeDetails(id: string): Promise<AnimeDetails | null> {
   try {
-    const res = await fetch(`http://localhost:5000/api/animes/${id}`, { cache: 'no-store' });
+    // Menggunakan Next.js API routes internal alih-alih Express server eksternal
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/animes/${id}`, { cache: 'no-store' });
     if (!res.ok) {
       return null;
     }
@@ -44,39 +46,7 @@ export default async function AnimeDetailPage({ params }: { params: { id: string
   // Fungsi untuk validasi URL gambar
   const isValidUrl = (url: string) => url && (url.startsWith('http://') || url.startsWith('https://'));
 
-  // --- Client Component untuk preview episode ---
-  // Gunakan React hook untuk state episode yang sedang dipreview
-  // Karena file ini async, perlu wrapper client component
-  //
-  // Komponen Client
-  //
-  // File: EpisodePreviewClient.tsx
-  //
-  // import { useState } from 'react';
-  // import EpisodePlayer from '@/components/EpisodePlayer';
-  //
-  // export default function EpisodePreviewClient({ episodes }: { episodes: Episode[] }) {
-  //   const [currentIdx, setCurrentIdx] = useState(0);
-  //   return (
-  //     <>
-  //       <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 mb-6">
-  //         {episodes.map((episode, idx) => (
-  //           <button
-  //             key={episode._id}
-  //             onClick={() => setCurrentIdx(idx)}
-  //             className={`flex items-center justify-center rounded p-3 text-center transition font-semibold ${currentIdx === idx ? 'bg-cyan-500 text-white' : 'bg-gray-700 hover:bg-cyan-500'}`}
-  //           >
-  //             {episode.episodeNumber}
-  //           </button>
-  //         ))}
-  //       </div>
-  //       <EpisodePlayer link={episodes[currentIdx].googleDriveLink} />
-  //     </>
-  //   );
-  // }
-
-  // --- End Client Component ---
-
+  
   // Import komponen client dengan dynamic import
   const DynamicEpisodePreviewClient = (await import('next/dynamic')).default(() => import('@/components/EpisodePreviewClient'), { ssr: false });
 
@@ -90,9 +60,9 @@ export default async function AnimeDetailPage({ params }: { params: { id: string
               <Image
                 src={anime.posterImage}
                 alt={`Poster for ${anime.title}`}
-                width={500}
-                height={700}
-                className="w-full rounded-lg object-cover"
+                width={300}
+                height={400}
+                className="rounded-lg object-cover"
               />
             ) : (
               <div className="flex h-[450px] w-full items-center justify-center rounded-lg bg-gray-700 text-sm text-gray-400">
