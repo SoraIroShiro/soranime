@@ -19,7 +19,6 @@ const AnimeSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, 'Judul tidak boleh kosong'],
-    unique: true,
   },
   synopsis: {
     type: String,

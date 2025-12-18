@@ -30,14 +30,38 @@ export async function POST(request) {
     
     await connectDB();
     
-    const { title, synopsis, posterImage, genres, rating, status, episodes } = await request.json();
+    const requestBody = await request.json();
+    console.log('Request body received:', JSON.stringify(requestBody, null, 2));
+    
+    const { title, synopsis, posterImage, genres, rating, status, episodes } = requestBody;
+    
+    console.log('Extracted fields:', {
+      title: title ? 'present' : 'missing',
+      synopsis: synopsis ? 'present' : 'missing',
+      posterImage: posterImage ? 'present' : 'missing',
+      genres: genres?.length || 0,
+      rating,
+      status,
+      episodes: episodes?.length || 0
+    });
 
     if (!title || !synopsis || !posterImage) {
+      console.log('Validation failed - missing required fields');
       return NextResponse.json(
         { message: 'Judul, sinopsis, dan posterImage tidak boleh kosong' },
         { status: 400 }
       );
     }
+
+    console.log('Creating anime with data:', {
+      title,
+      synopsis: synopsis?.substring(0, 50) + '...',
+      posterImage,
+      genres,
+      rating,
+      status,
+      episodes
+    });
 
     const anime = await Anime.create({
       title,
@@ -49,8 +73,19 @@ export async function POST(request) {
       episodes
     });
 
+    console.log('Anime created successfully:', anime._id);
     return NextResponse.json(anime, { status: 201 });
   } catch (error) {
+    console.error('Error creating anime:', error);
+    
+    // Handle duplicate title error
+    if (error.code === 11000 && error.keyPattern?.title) {
+      return NextResponse.json(
+        { message: 'Anime dengan judul ini sudah ada. Silakan gunakan judul yang berbeda.' },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
       { message: 'Gagal membuat anime', error: error.message },
       { status: 400 }
