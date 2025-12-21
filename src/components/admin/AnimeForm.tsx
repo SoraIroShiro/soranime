@@ -18,6 +18,7 @@ interface AnimeFormData {
 interface AnimeFormProps {
   onSubmit: (formData: AnimeFormData) => void;
   onCancel: () => void;
+  initialData?: AnimeFormData;
 }
 
 interface AniListAnime {
@@ -37,8 +38,8 @@ interface AniListAnime {
   status?: string;
 }
 
-export default function AnimeForm({ onSubmit, onCancel }: AnimeFormProps) {
-  const [formData, setFormData] = useState<AnimeFormData>({
+export default function AnimeForm({ onSubmit, onCancel, initialData }: AnimeFormProps) {
+  const [formData, setFormData] = useState<AnimeFormData>(initialData || {
     title: '',
     synopsis: '',
     posterImage: '',
@@ -351,7 +352,7 @@ export default function AnimeForm({ onSubmit, onCancel }: AnimeFormProps) {
                 <button
                   type="button"
                   onClick={addEpisode}
-                  className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors font-medium"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors font-medium"
                 >
                   ➕ Tambah Episode & Lanjut ke Berikutnya
                 </button>

@@ -6,8 +6,9 @@ import { verifyToken } from '@/middleware/auth';
 // GET /api/animes/[id] - Public
 export async function GET(request, { params }) {
   try {
+    const resolvedParams = await params;
     await connectDB();
-    const anime = await Anime.findById(params.id);
+    const anime = await Anime.findById(resolvedParams.id);
     
     if (!anime) {
       return NextResponse.json({ message: 'Anime tidak ditemukan' }, { status: 404 });
@@ -25,6 +26,7 @@ export async function GET(request, { params }) {
 // PUT /api/animes/[id] - Protected
 export async function PUT(request, { params }) {
   try {
+    const resolvedParams = await params;
     if (!verifyToken(request)) {
       return NextResponse.json(
         { message: 'Unauthorized - Admin access required' },
@@ -35,7 +37,7 @@ export async function PUT(request, { params }) {
     await connectDB();
     
     const updateData = await request.json();
-    const anime = await Anime.findByIdAndUpdate(params.id, updateData, { new: true });
+    const anime = await Anime.findByIdAndUpdate(resolvedParams.id, updateData, { new: true });
     
     if (!anime) {
       return NextResponse.json({ message: 'Anime tidak ditemukan' }, { status: 404 });
@@ -53,6 +55,7 @@ export async function PUT(request, { params }) {
 // DELETE /api/animes/[id] - Protected
 export async function DELETE(request, { params }) {
   try {
+    const resolvedParams = await params;
     if (!verifyToken(request)) {
       return NextResponse.json(
         { message: 'Unauthorized - Admin access required' },
@@ -62,7 +65,7 @@ export async function DELETE(request, { params }) {
     
     await connectDB();
     
-    const anime = await Anime.findByIdAndDelete(params.id);
+    const anime = await Anime.findByIdAndDelete(resolvedParams.id);
     
     if (!anime) {
       return NextResponse.json({ message: 'Anime tidak ditemukan' }, { status: 404 });

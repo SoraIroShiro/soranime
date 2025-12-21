@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import EpisodePlayer from '@/components/EpisodePlayer'; // <-- 1. Impor komponen baru
 
 // Tipe data untuk episode dan detail anime
 interface Episode {
@@ -22,9 +21,7 @@ interface AnimeDetails {
 // Fungsi untuk mengambil data detail dari API
 async function getAnimeDetails(id: string): Promise<AnimeDetails | null> {
   try {
-    // Menggunakan Next.js API routes internal alih-alih Express server eksternal
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/animes/${id}`, { cache: 'no-store' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/animes/${id}`, { cache: 'no-store' });
     if (!res.ok) {
       return null;
     }
@@ -36,9 +33,9 @@ async function getAnimeDetails(id: string): Promise<AnimeDetails | null> {
 }
 
 // Komponen halaman detail
-export default async function AnimeDetailPage({ params }: { params: { id: string } }) {
-
-  const anime = await getAnimeDetails(params.id);
+export default async function AnimeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const anime = await getAnimeDetails(resolvedParams.id);
   if (!anime) {
     return <div className="flex h-screen items-center justify-center bg-gray-900 text-white">Anime tidak ditemukan.</div>;
   }
