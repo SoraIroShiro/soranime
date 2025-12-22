@@ -6,6 +6,9 @@ import AnimeForm from "@/components/admin/AnimeForm";
 import Modal from "@/components/ui/Modal";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface Anime {
   _id: string;
   title: string;
