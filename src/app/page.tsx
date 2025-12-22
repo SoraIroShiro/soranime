@@ -18,6 +18,7 @@ async function getAnimes(): Promise<Anime[]> {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const res = await fetch(`${baseUrl}/api/animes`, { 
       cache: 'no-store',
+      next: { revalidate: 60 },
       headers: {
         'Content-Type': 'application/json',
       }

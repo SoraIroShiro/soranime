@@ -21,7 +21,17 @@ interface AnimeDetails {
 // Fungsi untuk mengambil data detail dari API
 async function getAnimeDetails(id: string): Promise<AnimeDetails | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/animes/${id}`, { cache: 'no-store' });
+
+    // const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/animes/${id}`, { cache: 'no-store' });
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      
+    const res = await fetch(`${baseUrl}/api/animes/${id}`, { 
+      cache: 'no-store',
+      next: { revalidate: 300 } // Cache 5 menit
+    });
+    
     if (!res.ok) {
       return null;
     }
