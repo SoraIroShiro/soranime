@@ -156,30 +156,35 @@ export default function AnimeForm({
     const cleanedDescription = cleanDescription(anime.description);
     const preferredTitle = getPreferredTitle(anime.title);
 
+    // Preserve episodes - jangan overwrite episodes yang sudah ada
+    const currentEpisodes = formData.episodes; // Simpan episodes yang sudah ada
+
     // Manipulasi URL untuk mendapatkan gambar large yang sebenarnya
     const getBestImage = () => {
-    const largeUrl = anime.coverImage.large || '';
-    const mediumUrl = anime.coverImage.medium || '';
-    
-    // Coba ubah path medium menjadi large di URL
-    if (largeUrl && largeUrl.includes('/medium/')) {
-      const actualLargeUrl = largeUrl.replace('/medium/', '/large/');
-      console.log("Generated Large URL:", actualLargeUrl);
-      return actualLargeUrl;
-    }
-    
-    // Fallback: coba dari medium URL
-    if (mediumUrl && mediumUrl.includes('/small/')) {
-      const actualLargeUrl = mediumUrl.replace('/small/', '/large/');
-      console.log("Generated Large URL from medium:", actualLargeUrl);
-      return actualLargeUrl;
-    }
-    
-    // Fallback terakhir
-    return largeUrl || mediumUrl || '';
-  };
+      const largeUrl = anime.coverImage.large || "";
+      const mediumUrl = anime.coverImage.medium || "";
 
-    setFormData({
+      
+
+      // Coba ubah path medium menjadi large di URL
+      if (largeUrl && largeUrl.includes("/medium/")) {
+        const actualLargeUrl = largeUrl.replace("/medium/", "/large/");
+        console.log("Generated Large URL:", actualLargeUrl);
+        return actualLargeUrl;
+      }
+
+      // Fallback: coba dari medium URL
+      if (mediumUrl && mediumUrl.includes("/small/")) {
+        const actualLargeUrl = mediumUrl.replace("/small/", "/large/");
+        console.log("Generated Large URL from medium:", actualLargeUrl);
+        return actualLargeUrl;
+      }
+
+      // Fallback terakhir
+      return largeUrl || mediumUrl || "";
+    };
+
+    setFormData((prev) => ({
       title: preferredTitle,
       synopsis: cleanedDescription,
       posterImage: getBestImage(),
@@ -188,8 +193,8 @@ export default function AnimeForm({
         ? Math.round((anime.averageScore / 10) * 10) / 10
         : 0,
       status: anime.status === "FINISHED" ? "Finished" : "Airing",
-      episodes: [],
-    });
+      episodes: currentEpisodes, // 🎯 Tetap gunakan episodes yang sudah ada, JANGAN overwrite
+    }));
 
     setShowResults(false);
     setSearchResults([]);
