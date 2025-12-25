@@ -429,7 +429,7 @@ export default function AnimeForm({
                 <button
                   type="button"
                   onClick={addEpisode}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors font-medium"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors duration-200 font-medium cursor-pointer transform hover:scale-105"
                 >
                   ➕ Tambah Episode & Lanjut ke Berikutnya
                 </button>
@@ -453,7 +453,7 @@ export default function AnimeForm({
                       <button
                         type="button"
                         onClick={() => removeEpisode(index)}
-                        className="text-red-400 hover:text-red-300 transition-colors"
+                        className="text-red-400 hover:text-red-300 transition-colors duration-200 cursor-pointer hover:bg-red-900 rounded-full w-6 h-6 flex items-center justify-center"
                       >
                         ✕
                       </button>
@@ -482,14 +482,14 @@ export default function AnimeForm({
         <div className="flex space-x-4 pt-4">
           <button
             type="submit"
-            className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition-colors font-medium"
+            className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition-colors duration-200 font-medium cursor-pointer transform hover:scale-105"
           >
             💾 Simpan Anime
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="bg-gray-600 text-white px-6 py-3 rounded hover:bg-gray-700 transition-colors"
+            className="bg-gray-600 text-white px-6 py-3 rounded hover:bg-gray-700 transition-colors duration-200 cursor-pointer transform hover:scale-105"
           >
             ✕ Cancel
           </button>

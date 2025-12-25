@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { getAuthToken } from "@/lib/auth";
 import AnimeForm from "@/components/admin/AnimeForm";
@@ -28,9 +28,13 @@ export default function AdminDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [expandedAnime, setExpandedAnime] = useState<string | null>(null);
   
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
+  
   // Edit state
   const [editingAnime, setEditingAnime] = useState<Anime | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
+  const editFormRef = useRef<HTMLDivElement>(null);
   
   // Modal state
   const [modal, setModal] = useState<{
@@ -105,6 +109,15 @@ export default function AdminDashboard() {
     setEditingAnime(anime);
     setShowEditForm(true);
     setShowAddForm(false); // Close add form if open
+    
+    // Scroll to edit form after state update
+    setTimeout(() => {
+      editFormRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start',
+        inline: 'nearest'
+      });
+    }, 100);
   };
 
   const cancelEdit = () => {
@@ -202,6 +215,11 @@ export default function AdminDashboard() {
       );
     }
   };
+
+  // Filter anime based on search query
+  const filteredAnimes = animes.filter(anime =>
+    anime.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   useEffect(() => {
     fetchAnimes();
@@ -397,19 +415,46 @@ export default function AdminDashboard() {
   return (
     <div className="p-8">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white">Dashboard Admin</h1>
           <p className="text-gray-400 mt-1">
             Kelola anime dengan AniList integration
           </p>
         </div>
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
-        >
-          {showAddForm ? "✕ Cancel" : "➕ Tambah Anime"}
-        </button>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto">
+          {/* Search Input */}
+          <div className="relative w-full sm:w-80">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Cari anime berdasarkan judul..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-gray-700 text-white pl-10 pr-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 w-full transition-colors duration-200"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white transition-colors duration-200"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium cursor-pointer transform hover:scale-105 w-full sm:w-auto whitespace-nowrap"
+          >
+            {showAddForm ? "✕ Cancel" : "➕ Tambah Anime"}
+          </button>
+        </div>
       </div>
 
       {/* Add Anime Form */}
@@ -442,6 +487,24 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Search Results Indicator */}
+      {searchQuery && (
+        <div className="mb-4">
+          <p className="text-gray-400 text-sm">
+            Menampilkan {filteredAnimes.length} dari {animes.length} anime untuk pencarian: 
+            <span className="text-white font-medium ml-1">&quot;{searchQuery}&quot;</span>
+            {filteredAnimes.length !== animes.length && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="ml-2 text-cyan-400 hover:text-cyan-300 text-sm underline transition-colors duration-200"
+              >
+                Tampilkan semua
+              </button>
+            )}
+          </p>
+        </div>
+      )}
+
       {/* Anime Table */}
       <div className="bg-gray-800 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
@@ -469,7 +532,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {animes.map((anime, index) => (
+              {filteredAnimes.map((anime, index) => (
                 <React.Fragment key={anime._id}>
                   <tr
                     className={`border-b border-gray-700 ${
@@ -515,7 +578,7 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4">
                       <button
                         onClick={() => toggleEpisodeDetails(anime._id)}
-                        className="flex items-center text-white hover:text-cyan-400 transition-colors"
+                        className="flex items-center text-white hover:text-cyan-400 transition-colors duration-200 cursor-pointer"
                       >
                         <span className="mr-2">
                           {anime.episodes?.length || 0} Episodes
@@ -529,13 +592,13 @@ export default function AdminDashboard() {
                       <div className="flex space-x-2">
                         <button 
                           onClick={() => startEditAnime(anime)}
-                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
+                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors duration-200 cursor-pointer transform hover:scale-105"
                         >
                           ✏️ Edit
                         </button>
                         <button
                           onClick={() => deleteAnime(anime._id)}
-                          className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
+                          className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors duration-200 cursor-pointer transform hover:scale-105"
                         >
                           🗑️ Delete
                         </button>
@@ -661,6 +724,23 @@ export default function AdminDashboard() {
             </tbody>
           </table>
         </div>
+        {filteredAnimes.length === 0 && animes.length > 0 && searchQuery && (
+          <div className="p-12 text-center">
+            <div className="text-gray-400 mb-4 text-6xl">🔍</div>
+            <h3 className="text-xl font-medium text-gray-300 mb-2">
+              Anime tidak ditemukan
+            </h3>
+            <p className="text-gray-400 mb-6">
+              Tidak ada anime yang cocok dengan pencarian &quot;{searchQuery}&quot;
+            </p>
+            <button
+              onClick={() => setSearchQuery("")}
+              className="bg-cyan-600 text-white px-6 py-3 rounded-lg hover:bg-cyan-700 transition-colors duration-200 cursor-pointer transform hover:scale-105"
+            >
+              🗑️ Bersihkan Pencarian
+            </button>
+          </div>
+        )}
         {animes.length === 0 && (
           <div className="p-12 text-center">
             <div className="text-gray-400 mb-4 text-6xl">📺</div>
@@ -672,7 +752,7 @@ export default function AdminDashboard() {
             </p>
             <button
               onClick={() => setShowAddForm(true)}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 cursor-pointer transform hover:scale-105"
             >
               ➕ Tambah Anime Sekarang
             </button>
@@ -682,7 +762,7 @@ export default function AdminDashboard() {
 
       {/* Edit Form - Using AnimeForm component */}
       {showEditForm && editingAnime && (
-        <div className="mb-8">
+        <div ref={editFormRef} className="mb-8">
           <div className="bg-gray border border-gray-200 rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-white">
@@ -690,7 +770,7 @@ export default function AdminDashboard() {
               </h2>
               <button
                 onClick={cancelEdit}
-                className="text-gray-500 hover:text-gray-700 text-xl font-bold px-2"
+                className="text-gray-500 hover:text-red-500 text-xl font-bold px-2 transition-colors duration-200 hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center"
               >
                 ✕
               </button>
