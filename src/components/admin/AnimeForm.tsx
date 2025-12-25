@@ -10,9 +10,17 @@ interface AnimeFormData {
   title: string;
   synopsis: string;
   posterImage: string;
+  bannerImage: string;
   genres: string[];
   rating: number;
   status: string;
+  studios: string[];
+  streamingEpisodes: Array<{
+    title: string;
+    thumbnail: string;
+    url: string;
+    site: string;
+  }>;
   episodes: Array<{
     episodeNumber: number;
     googleDriveLink: string;
@@ -37,9 +45,21 @@ interface AniListAnime {
     large?: string;
     medium?: string;
   };
+  bannerImage?: string;
   genres?: string[];
   averageScore?: number;
   status?: string;
+  studios?: {
+    nodes: Array<{
+      name: string;
+    }>;
+  };
+  streamingEpisodes?: Array<{
+    title: string;
+    thumbnail: string;
+    url: string;
+    site: string;
+  }>;
 }
 
 export default function AnimeForm({
@@ -52,9 +72,12 @@ export default function AnimeForm({
       title: "",
       synopsis: "",
       posterImage: "",
+      bannerImage: "",
       genres: [],
       rating: 0,
       status: "Airing",
+      studios: [],
+      streamingEpisodes: [],
       episodes: [],
     }
   );
@@ -188,11 +211,14 @@ export default function AnimeForm({
       title: preferredTitle,
       synopsis: cleanedDescription,
       posterImage: getBestImage(),
+      bannerImage: anime.bannerImage || "",
       genres: anime.genres || [],
       rating: anime.averageScore
         ? Math.round((anime.averageScore / 10) * 10) / 10
         : 0,
       status: anime.status === "FINISHED" ? "Finished" : "Airing",
+      studios: anime.studios?.nodes?.map(studio => studio.name) || [],
+      streamingEpisodes: anime.streamingEpisodes || [],
       episodes: currentEpisodes, // 🎯 Tetap gunakan episodes yang sudah ada, JANGAN overwrite
     }));
 
@@ -365,6 +391,105 @@ export default function AnimeForm({
             </div>
           )}
         </div>
+
+        <div>
+          <label className="block text-gray-300 mb-2">Banner Image URL (Optional)</label>
+          <input
+            type="url"
+            value={formData.bannerImage}
+            onChange={(e) =>
+              setFormData({ ...formData, bannerImage: e.target.value })
+            }
+            className="w-full p-3 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            placeholder="https://example.com/banner.jpg"
+          />
+          {formData.bannerImage && (
+            <div className="mt-3">
+              <p className="text-gray-400 text-sm mb-2">Banner Preview:</p>
+              <img
+                src={formData.bannerImage}
+                alt="Banner Preview"
+                className="w-full h-20 object-cover rounded border border-gray-600"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+                onLoad={(e) => {
+                  e.currentTarget.style.display = "block";
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-gray-300 mb-2">Studios (Auto-filled from AniList)</label>
+          <input
+            type="text"
+            value={formData.studios.join(", ")}
+            onChange={(e) =>
+              setFormData({ 
+                ...formData, 
+                studios: e.target.value.split(",").map(s => s.trim()).filter(s => s.length > 0)
+              })
+            }
+            className="w-full p-3 bg-gray-600 text-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            placeholder="Studio Pierrot, Madhouse"
+            readOnly={formData.studios.length > 0}
+          />
+          {formData.studios.length > 0 && (
+            <div className="mt-2">
+              <p className="text-gray-400 text-sm">Studios from AniList:</p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.studios.map((studio, index) => (
+                  <span key={index} className="bg-purple-600 text-white px-2 py-1 rounded text-sm">
+                    {studio}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Streaming Episodes Preview */}
+        {formData.streamingEpisodes.length > 0 && (
+          <div>
+            <label className="block text-gray-300 mb-2">
+              Streaming Episodes (Preview from AniList) - {formData.streamingEpisodes.length} episodes
+            </label>
+            <div className="bg-gray-700 p-4 rounded border border-gray-600">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-40 overflow-y-auto">
+                {formData.streamingEpisodes.slice(0, 6).map((episode, index) => (
+                  <div key={index} className="flex items-center space-x-3 bg-gray-600 p-2 rounded">
+                    <img
+                      src={episode.thumbnail || "/placeholder.jpg"}
+                      alt={episode.title}
+                      className="w-12 h-8 object-cover rounded"
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.jpg";
+                      }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm font-medium truncate">
+                        {episode.title}
+                      </p>
+                      <p className="text-gray-400 text-xs">
+                        {episode.site}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {formData.streamingEpisodes.length > 6 && (
+                <p className="text-gray-400 text-sm mt-2 text-center">
+                  ... and {formData.streamingEpisodes.length - 6} more episodes
+                </p>
+              )}
+              <p className="text-gray-500 text-xs mt-2">
+                ℹ️ This is preview data from AniList. Use the manual episode section below to add your Google Drive links.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div>
           <label className="block text-gray-300 mb-2">Synopsis *</label>

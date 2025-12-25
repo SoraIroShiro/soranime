@@ -12,9 +12,17 @@ interface Anime {
   title: string;
   synopsis: string;
   posterImage: string;
+  bannerImage?: string;
   genres: string[];
   rating: number;
   status: string;
+  studios?: string[];
+  streamingEpisodes?: Array<{
+    title: string;
+    thumbnail: string;
+    url: string;
+    site: string;
+  }>;
   episodes: Array<{
     _id: string;
     episodeNumber: number;
@@ -129,9 +137,17 @@ export default function AdminDashboard() {
     title: string;
     synopsis: string;
     posterImage: string;
+    bannerImage: string;
     genres: string[];
     rating: number;
     status: string;
+    studios: string[];
+    streamingEpisodes: Array<{
+      title: string;
+      thumbnail: string;
+      url: string;
+      site: string;
+    }>;
     episodes: Array<{
       episodeNumber: number;
       googleDriveLink: string;
@@ -780,9 +796,12 @@ export default function AdminDashboard() {
                 title: editingAnime.title,
                 synopsis: editingAnime.synopsis,
                 posterImage: editingAnime.posterImage,
+                bannerImage: editingAnime.bannerImage || "",
                 genres: editingAnime.genres,
                 rating: editingAnime.rating,
                 status: editingAnime.status,
+                studios: editingAnime.studios || [],
+                streamingEpisodes: editingAnime.streamingEpisodes || [],
                 episodes: editingAnime.episodes || []
               }}
               onSubmit={handleUpdateAnime}

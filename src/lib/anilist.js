@@ -9,12 +9,14 @@ export const searchAnimeByTitle = async (title) => {
           title {
             romaji
             native
+            
           }
           description(asHtml: false)
           coverImage {
             large
             medium
           }
+          bannerImage
           genres
           averageScore
           status
@@ -23,6 +25,12 @@ export const searchAnimeByTitle = async (title) => {
             nodes {
               name
             }
+          }
+          streamingEpisodes {
+            title
+            thumbnail
+            url
+            site
           }
           startDate {
             year

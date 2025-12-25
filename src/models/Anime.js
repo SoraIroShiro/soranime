@@ -15,6 +15,25 @@ const EpisodeSchema = new mongoose.Schema({
   },
 });
 
+const StreamingEpisodeSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  thumbnail: {
+    type: String,
+    required: false,
+  },
+  url: {
+    type: String,
+    required: true,
+  },
+  site: {
+    type: String,
+    required: true,
+  },
+});
+
 const AnimeSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -36,11 +55,19 @@ const AnimeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  bannerImage: {
+    type: String,
+    required: false,
+  },
+  studios: [{
+    type: String,
+  }],
   status: {
     type: String,
     enum: ['Airing', 'Finished'],
     default: 'Airing',
   },
+  streamingEpisodes: [StreamingEpisodeSchema],
   episodes: [EpisodeSchema],
 }, {
   timestamps: true, // Menambahkan createdAt dan updatedAt

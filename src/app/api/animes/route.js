@@ -33,15 +33,29 @@ export async function POST(request) {
     const requestBody = await request.json();
     console.log('Request body received:', JSON.stringify(requestBody, null, 2));
     
-    const { title, synopsis, posterImage, genres, rating, status, episodes } = requestBody;
+    const { 
+      title, 
+      synopsis, 
+      posterImage, 
+      bannerImage, 
+      genres, 
+      rating, 
+      status, 
+      studios, 
+      streamingEpisodes, 
+      episodes 
+    } = requestBody;
     
     console.log('Extracted fields:', {
       title: title ? 'present' : 'missing',
       synopsis: synopsis ? 'present' : 'missing',
       posterImage: posterImage ? 'present' : 'missing',
+      bannerImage: bannerImage ? 'present' : 'missing',
       genres: genres?.length || 0,
       rating,
       status,
+      studios: studios?.length || 0,
+      streamingEpisodes: streamingEpisodes?.length || 0,
       episodes: episodes?.length || 0
     });
 
@@ -57,9 +71,12 @@ export async function POST(request) {
       title,
       synopsis: synopsis?.substring(0, 50) + '...',
       posterImage,
+      bannerImage,
       genres,
       rating,
       status,
+      studios,
+      streamingEpisodes: streamingEpisodes?.length || 0,
       episodes
     });
 
@@ -67,9 +84,12 @@ export async function POST(request) {
       title,
       synopsis,
       posterImage,
+      bannerImage,
       genres,
       rating,
       status,
+      studios,
+      streamingEpisodes,
       episodes
     });
 
