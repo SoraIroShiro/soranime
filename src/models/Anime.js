@@ -35,6 +35,12 @@ const StreamingEpisodeSchema = new mongoose.Schema({
 });
 
 const AnimeSchema = new mongoose.Schema({
+  anilistId: {
+    type: Number,
+    required: false,
+    unique: true,
+    sparse: true, // Allow null values but enforce uniqueness when present
+  },
   title: {
     type: String,
     required: [true, 'Judul tidak boleh kosong'],

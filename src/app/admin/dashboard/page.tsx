@@ -9,6 +9,7 @@ import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
 interface Anime {
   _id: string;
+  anilistId?: number;
   title: string;
   synopsis: string;
   posterImage: string;
@@ -134,6 +135,7 @@ export default function AdminDashboard() {
   };
 
   const handleUpdateAnime = async (formData: {
+    anilistId?: number;
     title: string;
     synopsis: string;
     posterImage: string;
@@ -793,6 +795,7 @@ export default function AdminDashboard() {
             </div>
             <AnimeForm
               initialData={{
+                anilistId: editingAnime.anilistId,
                 title: editingAnime.title,
                 synopsis: editingAnime.synopsis,
                 posterImage: editingAnime.posterImage,

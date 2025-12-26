@@ -7,6 +7,7 @@ import {
 } from "@/lib/anilist";
 
 interface AnimeFormData {
+  anilistId?: number;
   title: string;
   synopsis: string;
   posterImage: string;
@@ -69,6 +70,7 @@ export default function AnimeForm({
 }: AnimeFormProps) {
   const [formData, setFormData] = useState<AnimeFormData>(
     initialData || {
+      anilistId: undefined,
       title: "",
       synopsis: "",
       posterImage: "",
@@ -208,6 +210,7 @@ export default function AnimeForm({
     };
 
     setFormData((prev) => ({
+      anilistId: anime.id,
       title: preferredTitle,
       synopsis: cleanedDescription,
       posterImage: getBestImage(),
@@ -342,6 +345,16 @@ export default function AnimeForm({
               className="w-full p-3 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500"
               required
             />
+            {formData.anilistId && (
+              <div className="mt-2">
+                <div className="flex items-center space-x-2 text-sm">
+                  <span className="bg-blue-600 text-white px-2 py-1 rounded">
+                    🔗 AniList ID: {formData.anilistId}
+                  </span>
+                  <span className="text-green-400">✓ Connected to AniList</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div>

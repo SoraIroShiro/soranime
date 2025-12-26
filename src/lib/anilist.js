@@ -95,3 +95,122 @@ export const cleanDescription = (description) => {
 export const getPreferredTitle = (titleObj) => {
   return titleObj.english || titleObj.romaji || titleObj.native || 'Unknown Title';
 };
+
+// Get anime details by AniList ID
+export const getAnimeByAniListId = async (anilistId) => {
+  const query = `
+    query ($id: Int) {
+      Media(id: $id, type: ANIME) {
+        id
+        title {
+          romaji
+          native
+          english
+        }
+        description(asHtml: false)
+        coverImage {
+          large
+          medium
+        }
+        bannerImage
+        genres
+        averageScore
+        status
+        episodes
+        studios {
+          nodes {
+            name
+          }
+        }
+        streamingEpisodes {
+          title
+          thumbnail
+          url
+          site
+        }
+        characters {
+          edges {
+            role
+            node {
+              name {
+                full
+              }
+              image {
+                medium
+              }
+            }
+          }
+        }
+        staff {
+          edges {
+            role
+            node {
+              name {
+                full
+              }
+            }
+          }
+        }
+        trailer {
+          id
+          site
+          thumbnail
+        }
+        relations {
+          edges {
+            relationType
+            node {
+              id
+              title {
+                romaji
+                english
+              }
+              coverImage {
+                medium
+              }
+            }
+          }
+        }
+        startDate {
+          year
+          month
+          day
+        }
+        endDate {
+          year
+          month
+          day
+        }
+      }
+    }
+  `;
+
+  const variables = { id: parseInt(anilistId) };
+
+  try {
+    const response = await fetch('https://graphql.anilist.co', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ query, variables }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.errors) {
+      console.error('GraphQL errors:', data.errors);
+      return null;
+    }
+
+    return data.data.Media;
+  } catch (error) {
+    console.error('AniList API Error:', error);
+    return null;
+  }
+};

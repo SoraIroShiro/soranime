@@ -34,6 +34,7 @@ export async function POST(request) {
     console.log('Request body received:', JSON.stringify(requestBody, null, 2));
     
     const { 
+      anilistId,
       title, 
       synopsis, 
       posterImage, 
@@ -47,6 +48,7 @@ export async function POST(request) {
     } = requestBody;
     
     console.log('Extracted fields:', {
+      anilistId: anilistId || 'not provided',
       title: title ? 'present' : 'missing',
       synopsis: synopsis ? 'present' : 'missing',
       posterImage: posterImage ? 'present' : 'missing',
@@ -68,6 +70,7 @@ export async function POST(request) {
     }
 
     console.log('Creating anime with data:', {
+      anilistId,
       title,
       synopsis: synopsis?.substring(0, 50) + '...',
       posterImage,
@@ -81,6 +84,7 @@ export async function POST(request) {
     });
 
     const anime = await Anime.create({
+      anilistId,
       title,
       synopsis,
       posterImage,
