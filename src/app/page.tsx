@@ -63,7 +63,7 @@ export default async function HomePage() {
         <div className="relative container mx-auto px-4 py-16 sm:py-20">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
-              Selamat Datang di SorAnime
+              Selamat Datang di SoraNime
             </h1>
             <p className="text-lg sm:text-xl text-gray-200 mb-8 drop-shadow-lg">
               Jelajahi koleksi anime terbaik dengan kualitas streaming terdepan

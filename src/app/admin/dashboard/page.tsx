@@ -493,13 +493,13 @@ export default function AdminDashboard() {
         </div>
         <div className="bg-gray-800 p-6 rounded-lg">
           <h3 className="text-gray-400 text-sm mb-2">Airing</h3>
-          <p className="text-2xl font-bold text-green-400">
+          <p className="text-2xl font-bold text-blue-400">
             {animes.filter((anime) => anime.status === "Airing").length}
           </p>
         </div>
         <div className="bg-gray-800 p-6 rounded-lg">
           <h3 className="text-gray-400 text-sm mb-2">Finished</h3>
-          <p className="text-2xl font-bold text-blue-400">
+          <p className="text-2xl font-bold text-green-400">
             {animes.filter((anime) => anime.status === "Finished").length}
           </p>
         </div>

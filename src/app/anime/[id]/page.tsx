@@ -177,14 +177,37 @@ export default async function AnimeDetailPage({ params }: { params: Promise<{ id
   // Import komponen client dengan dynamic import
   const DynamicEpisodePreviewClient = (await import('next/dynamic')).default(() => import('@/components/EpisodePreviewClient'), { ssr: false });
 
+  // Helper function untuk mendapatkan banner image dengan priority
+  const getBannerImage = () => {
+    // Priority 1: AniList banner (kualitas tinggi, official)
+    if (anilistData?.bannerImage && isValidUrl(anilistData.bannerImage)) {
+      return anilistData.bannerImage;
+    }
+    
+    // Priority 2: Database banner (custom upload admin)
+    if (anime.bannerImage && isValidUrl(anime.bannerImage)) {
+      return anime.bannerImage;
+    }
+    
+    // No banner available
+    return null;
+  };
+
+  // Helper function untuk menentukan apakah menggunakan poster sebagai banner fallback
+  const shouldUsePosterAsBanner = () => {
+    const hasBanner = getBannerImage();
+    const hasPoster = isValidUrl(anilistData?.coverImage?.large || anime.posterImage);
+    return !hasBanner && hasPoster;
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white">
       {/* Hero Section dengan Banner */}
-      {anilistData?.bannerImage && (
+      {getBannerImage() ? (
         <div className="relative h-80 md:h-96 overflow-hidden">
           <div className="absolute inset-0 bg-black/50 z-10"></div>
           <Image
-            src={anilistData.bannerImage}
+            src={getBannerImage()!}
             alt={`Banner for ${anime.title}`}
             fill
             className="object-cover"
@@ -210,7 +233,40 @@ export default async function AnimeDetailPage({ params }: { params: Promise<{ id
             </div>
           </div>
         </div>
-      )}
+      ) : shouldUsePosterAsBanner() ? (
+        // Fallback: Use poster as banner with different styling
+        <div className="relative h-80 md:h-96 overflow-hidden">
+          <div className="absolute inset-0 bg-black/70 z-10"></div>
+          <div className="absolute inset-0 blur-sm scale-110">
+            <Image
+              src={anilistData?.coverImage?.large || anime.posterImage}
+              alt={`Banner fallback for ${anime.title}`}
+              fill
+              className="object-cover"
+            />
+          </div>
+          <div className="relative z-20 flex items-end h-full container mx-auto px-4">
+            <div className="pb-8">
+              <h1 className="text-4xl md:text-6xl font-bold mb-2 drop-shadow-lg">
+                {getPreferredTitle(anilistData?.title)}
+              </h1>
+              <div className="flex items-center space-x-4 text-lg">
+                <span className="bg-yellow-500 text-black px-3 py-1 rounded-full font-bold">
+                  ⭐ {anilistData?.averageScore ? (anilistData.averageScore / 10).toFixed(1) : anime.rating}
+                </span>
+                <span className="bg-blue-600 px-3 py-1 rounded-full">
+                  {anilistData?.status || anime.status}
+                </span>
+                {anilistData?.format && (
+                  <span className="bg-purple-600 px-3 py-1 rounded-full">
+                    {anilistData.format}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -326,7 +382,7 @@ export default async function AnimeDetailPage({ params }: { params: Promise<{ id
 
           {/* Main Content */}
           <div className="lg:col-span-3">
-            {!anilistData?.bannerImage && (
+            {!getBannerImage() && !shouldUsePosterAsBanner() && (
               <div className="mb-8">
                 <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
                   {getPreferredTitle(anilistData?.title)}
